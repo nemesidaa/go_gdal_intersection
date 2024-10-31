@@ -19,20 +19,25 @@ type Server struct {
 	conf       *config.Config
 }
 
-func NewServer(conf *config.Config) *Server {
+func NewServer(conf *config.Config) (*Server, error) {
 	serv := new(Server)
-	serv.Controller = NewController(conf)
+	var err error
+	serv.Controller, err = NewController(conf)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create controller: %w", err)
+	}
 	serv.conf = conf
+	// ! Z Я тут говна написал, но в целом понятно всё
 	logf, err := os.OpenFile(conf.Logdest, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to open log file: %w", err)
 	}
 	serv.Logger = zerolog.New(logf).Level(zerolog.DebugLevel).With().Timestamp().Logger()
 	serv.Router = chi.NewRouter()
 	serv.Router.Use(serv.Log)
 	serv.Router.Get("/intersect_polygons", serv.IntersectPolygons)
 	serv.Logger.Debug().Msg("Server initialized")
-	return serv
+	return serv, nil
 }
 
 // ? Addr in format: 0.0.0.0:00000

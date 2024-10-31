@@ -1,49 +1,59 @@
 package gdal_ord
 
-// import (
-// 	"fmt"
-// 	"gogdal/internal/config"
-// 	vars "gogdal/internal/gdal/vars"
+import (
+	"fmt"
+	"gogdal/internal/config"
+	vars "gogdal/internal/gdal/vars"
 
-// 	"github.com/lukeroth/gdal"
-// )
+	"github.com/airbusgeo/godal"
+)
 
-// // * Getting spatref from config
-// type GdalWorker struct {
-// 	spatref gdal.SpatialReference
-// }
+// * Getting spatref from config
+type GdalWorker struct {
+	spatref *godal.SpatialRef
+}
 
-// func NewGdalWorker(conf *config.Config) *GdalWorker {
-// 	spatialRef := gdal.CreateSpatialReference("")
-// 	spatialRef.FromEPSG(conf.Spatref)
-// 	return &GdalWorker{
-// 		spatref: spatialRef,
-// 	}
-// }
+func NewGdalWorker(conf *config.Config) (*GdalWorker, error) {
+	spatialRef, err := godal.NewSpatialRefFromEPSG(conf.Spatref)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create spatial reference: %w", err)
+	}
+	return &GdalWorker{
+		spatref: spatialRef,
+	}, nil
+}
 
-// // ? Getting polys in WKT or GeoJSON formats, outputting square and existance of the intersection
-// func (gdalw *GdalWorker) IntersectPolygons(polys ...string) (float64, bool, error) {
-// 	ppolys := make([]gdal.Geometry, 0)
-// 	for idx, upoly := range polys {
-// 		var err error
-// 		switch vars.GetType(upoly) {
-// 		case vars.WKT:
-// 			ppolys[idx], err = gdal.CreateFromWKT(upoly, gdalw.spatref)
-// 			if err != nil {
-// 				fmt.Printf("failed to create geometry from WKT: %w", err)
-// 				continue
-// 			}
-// 		case vars.GeoJSON:
-// 			ppolys[idx] = gdal.CreateFromJson(upoly)
-// 		default:
-// 			continue
-// 		}
+// ? Getting polys in WKT or GeoJSON formats, outputting square and existance of the intersection
+func (gdalw *GdalWorker) IntersectPolygons(polys ...string) (float64, bool, error) {
+	ppolys := make([]*godal.Geometry, 0, len(polys))
+	for _, upoly := range polys {
+		switch vars.GetType(upoly) {
+		case vars.WKT:
+			ppoly, err := godal.NewGeometryFromWKT(upoly, gdalw.spatref)
+			if err != nil || ppoly == nil {
+				fmt.Printf("failed to create geometry from WKT: %v", err)
+				continue
+			}
+			ppolys = append(ppolys, ppoly)
+		case vars.GeoJSON:
+			ppoly, err := godal.NewGeometryFromGeoJSON(upoly)
+			if err != nil || ppoly == nil {
+				continue
+			}
+			ppolys = append(ppolys, ppoly)
+		default:
+			continue
+		}
 
-// 	}
-// 	var resp gdal.Geometry
-// 	for _, poly := range ppolys {
-// 		resp = resp.Intersection(poly)
-// 	}
-// 	a := resp.Area()
-// 	return a, a != 0, nil
-// }
+	}
+	resp := ppolys[0]
+	for _, poly := range ppolys[1:] {
+		var err error
+		resp, err = resp.Intersection(poly)
+		if err != nil {
+			return 0, false, fmt.Errorf("failed to intersect polygons: %w", err)
+		}
+	}
+	a := resp.Area()
+	return a, a != 0, nil
+}

@@ -22,7 +22,10 @@ func main() {
 	if err := conf.Parse(cpath); err != nil {
 		panic(err)
 	}
-	serv := http.NewServer(conf)
+	serv, err := http.NewServer(conf)
+	if err != nil {
+		panic(err)
+	}
 	if err := serv.Serve(conf.Addr); err != nil {
 		panic(err)
 	}
