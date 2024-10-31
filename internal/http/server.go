@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gogdal/internal/config"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -18,9 +19,12 @@ type Server struct {
 func NewServer(conf *config.Config) *Server {
 	serv := new(Server)
 	serv.Controller = NewController(conf)
+	serv.conf = conf
 	serv.Router = chi.NewRouter()
+	serv.Router.Use(serv.Log)
 	serv.Router.Get("/intersect_polygons", serv.IntersectPolygons)
 	return serv
+
 }
 
 // ? Addr in format: 0.0.0.0:00000
@@ -45,4 +49,31 @@ func (s *Server) IntersectPolygons(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+}
+
+type responseWriter struct {
+	http.ResponseWriter
+	status int
+}
+
+func (rw *responseWriter) WriteHeader(status int) {
+	rw.status = status
+	rw.ResponseWriter.WriteHeader(status)
+}
+
+func (s *Server) Log(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ww := &responseWriter{w, http.StatusOK}
+		start := time.Now()
+		next.ServeHTTP(ww, r)
+		end := time.Now()
+		fmt.Printf(
+			"%s %s %d %s %v\n",
+			r.Method,
+			r.URL.Path,
+			ww.status,
+			http.StatusText(ww.status),
+			end.Sub(start),
+		)
+	})
 }
