@@ -4,17 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"gogdal/internal/config"
-	"gogdal/internal/log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog"
 )
 
 type Server struct {
 	Router     chi.Router
 	Controller *Controller
-	Logger     *log.Logger
+	Logger     zerolog.Logger
 	conf       *config.Config
 }
 
@@ -22,40 +23,49 @@ func NewServer(conf *config.Config) *Server {
 	serv := new(Server)
 	serv.Controller = NewController(conf)
 	serv.conf = conf
-	serv.Logger = log.NewLogger(conf.LdestArr)
+	logf, err := os.OpenFile(conf.Logdest, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		panic(err)
+	}
+	serv.Logger = zerolog.New(logf).Level(zerolog.DebugLevel).With().Timestamp().Logger()
 	serv.Router = chi.NewRouter()
 	serv.Router.Use(serv.Log)
 	serv.Router.Get("/intersect_polygons", serv.IntersectPolygons)
+	serv.Logger.Debug().Msg("Server initialized")
 	return serv
-
-}
-
-func (s *Server) Close() {
-	s.Logger.Close()
 }
 
 // ? Addr in format: 0.0.0.0:00000
 func (s *Server) Serve(addr string) error {
+	s.Logger.Info().Str("addr", addr).Msg("starting server")
+	s.Logger.Debug().Msg("Server is about to start listening")
+
 	return http.ListenAndServe(addr, s.Router)
 }
 
 func (s *Server) IntersectPolygons(w http.ResponseWriter, r *http.Request) {
+	s.Logger.Debug().Msg("Handling intersect polygons request")
 	var polys []string
 	err := json.NewDecoder(r.Body).Decode(&polys)
 	if err != nil {
 		http.Error(w, "failed to read json data", http.StatusBadRequest)
+		s.Logger.Error().Err(err).Msg("failed to read json data")
 		return
 	}
-	res, ok, err := s.Controller.IntersectPolygons()
+	s.Logger.Debug().Msgf("Decoded polygons: %v", polys)
+	res, ok, err := s.Controller.IntersectPolygons(polys...)
 	if !ok || err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		s.Logger.Error().Err(err).Msg("failed to intersect polygons")
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write([]byte(fmt.Sprintf("%f", res))); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		s.Logger.Error().Err(err).Msg("failed to write response")
 		return
 	}
+	s.Logger.Debug().Msgf("Intersection result: %f", res)
 }
 
 type responseWriter struct {
@@ -70,10 +80,17 @@ func (rw *responseWriter) WriteHeader(status int) {
 
 func (s *Server) Log(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		s.Logger.Debug().Msg("Logging request")
 		ww := &responseWriter{w, http.StatusOK}
 		start := time.Now()
 		next.ServeHTTP(ww, r)
 		end := time.Now()
-		s.Logger.Println(fmt.Sprintf("%s %s %d %dms", r.Method, r.URL.Path, ww.status, end.Sub(start).Milliseconds()))
+		s.Logger.Info().Fields(map[string]interface{}{
+			"method":   r.Method,
+			"path":     r.URL.Path,
+			"status":   ww.status,
+			"duration": end.Sub(start),
+		}).Msg("")
+		s.Logger.Debug().Msg("Request logged")
 	})
 }

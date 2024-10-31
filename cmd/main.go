@@ -23,7 +23,6 @@ func main() {
 		panic(err)
 	}
 	serv := http.NewServer(conf)
-	defer serv.Close()
 	if err := serv.Serve(conf.Addr); err != nil {
 		panic(err)
 	}
