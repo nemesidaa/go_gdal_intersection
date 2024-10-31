@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gogdal/internal/config"
+	"gogdal/internal/log"
 	"net/http"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 type Server struct {
 	Router     chi.Router
 	Controller *Controller
+	Logger     *log.Logger
 	conf       *config.Config
 }
 
@@ -20,11 +22,16 @@ func NewServer(conf *config.Config) *Server {
 	serv := new(Server)
 	serv.Controller = NewController(conf)
 	serv.conf = conf
+	serv.Logger = log.NewLogger(conf.LdestArr)
 	serv.Router = chi.NewRouter()
 	serv.Router.Use(serv.Log)
 	serv.Router.Get("/intersect_polygons", serv.IntersectPolygons)
 	return serv
 
+}
+
+func (s *Server) Close() {
+	s.Logger.Close()
 }
 
 // ? Addr in format: 0.0.0.0:00000
@@ -67,13 +74,6 @@ func (s *Server) Log(next http.Handler) http.Handler {
 		start := time.Now()
 		next.ServeHTTP(ww, r)
 		end := time.Now()
-		fmt.Printf(
-			"%s %s %d %s %v\n",
-			r.Method,
-			r.URL.Path,
-			ww.status,
-			http.StatusText(ww.status),
-			end.Sub(start),
-		)
+		s.Logger.Println(fmt.Sprintf("%s %s %d %dms", r.Method, r.URL.Path, ww.status, end.Sub(start).Milliseconds()))
 	})
 }

@@ -2,15 +2,18 @@ package config
 
 import (
 	"fmt"
+	"gogdal/internal/log"
 	"os"
 
 	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
-	Addr       string `yaml:"addr"`
-	Spatref    int    `yaml:"spatref"`
-	WorkerType string `yaml:"worker_type"`
+	Addr       string        `yaml:"addr"`
+	Spatref    int           `yaml:"spatref"`
+	WorkerType string        `yaml:"worker_type"`
+	Logdest    string        `yaml:"logdest"`
+	LdestArr   []log.LogDest `yaml:"-"`
 }
 
 func (conf *Config) Parse(path string) error {
@@ -19,5 +22,10 @@ func (conf *Config) Parse(path string) error {
 		return fmt.Errorf("failed to open config file: %w", err)
 	}
 
-	return yaml.NewDecoder(file).Decode(conf)
+	if err := yaml.NewDecoder(file).Decode(conf); err != nil {
+		return fmt.Errorf("failed to decode config file: %w", err)
+	}
+	conf.LdestArr = log.ParseLogDest(conf.Logdest)
+
+	return nil
 }
