@@ -1,5 +1,12 @@
-mkdir bins &
+if [ ! -d "bins" ]; then
+    mkdir bins
+fi
+
+
+echo "Building service..."
 go build -o ./bins/service ../cmd/main.go 
+
 # * Waiting for service to start*  
 
+echo "Starting service..."
 ./bins/service ../cmd/conf.yaml
