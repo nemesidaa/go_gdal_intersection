@@ -8,12 +8,12 @@ import (
 )
 
 type Config struct {
-	Addr       string `yaml:"addr"`
-	Spatref    int    `yaml:"spatref"`
-	WorkerType string `yaml:"worker_type"`
-	Logdest    string `yaml:"logdest"`
-	Loglevel   string `yaml:"loglevel"`
-	Verbose    string `yaml:"verbose"`
+	Addr       string `yaml:"addr"`        // * 0.0.0.0:8086 by default
+	Spatref    int    `yaml:"spatref"`     // * 4326 by default
+	WorkerType string `yaml:"worker_type"` // * ord by default, also have mock, inventions in gdal/structs
+	Logdest    string `yaml:"logdest"`     // * logs/service_poly_intersection.log by default
+	Loglevel   string `yaml:"loglevel"`    // * info by default
+	Verbose    string `yaml:"verbose"`     // * true by default, provides to see swagger docs
 }
 
 func (conf *Config) Parse(path string) error {
