@@ -1,0 +1,5 @@
+mkdir bins &
+go build -o ./bins/service ../cmd/main.go 
+# * Waiting for service to start*  
+
+./bins/service ../cmd/conf.yaml

@@ -1,2 +1,6 @@
 intersect_service*
 **/logs/**
+
+!scripts/**
+scripts/bins/**
+scripts/logs/**
