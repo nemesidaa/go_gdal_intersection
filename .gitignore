@@ -1,3 +1,2 @@
 intersect_service*
-internal/tests/logs/**
-cmd/logs/**
+**/logs/**

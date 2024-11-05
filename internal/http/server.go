@@ -6,6 +6,7 @@ import (
 	"gogdal/internal/config"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -28,11 +29,18 @@ func NewServer(conf *config.Config) (*Server, error) {
 	}
 	serv.conf = conf
 	// ! Z Я тут говна написал, но в целом понятно всё
+	logdir := filepath.Dir(conf.Logdest)
+	if err := os.MkdirAll(logdir, 0777); err != nil {
+		return nil, fmt.Errorf("failed to create log directory: %w", err)
+	}
 	logf, err := os.OpenFile(conf.Logdest, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)
 	}
 	level, err := zerolog.ParseLevel(conf.Loglevel)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse log level: %w", err)
+	}
 	serv.Logger = zerolog.New(logf).Level(level).With().Timestamp().Logger()
 	serv.Router = chi.NewRouter()
 	serv.Router.Use(serv.Log)
