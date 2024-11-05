@@ -25,6 +25,12 @@ func parse() {
 		os.Exit(2)
 	}
 }
+
+// @title Gogdal polygon intersection
+// @version 1.0
+// @description This is a sample API. By default, provides 8086 port as main. Provides to intersect multiple value of polygons in WKT or GeoJSON formats
+// @host localhost:8086
+// @BasePath /
 func main() {
 	parse()
 

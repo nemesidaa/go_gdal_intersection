@@ -13,6 +13,7 @@ type Config struct {
 	WorkerType string `yaml:"worker_type"`
 	Logdest    string `yaml:"logdest"`
 	Loglevel   string `yaml:"loglevel"`
+	Verbose    string `yaml:"verbose"`
 }
 
 func (conf *Config) Parse(path string) error {

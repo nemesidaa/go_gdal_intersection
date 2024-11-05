@@ -3,3 +3,4 @@ spatref: 4326
 worker_type: "ord"
 logdest: "logs/service_poly_intersection.log"
 loglevel: "info"
+verbose: "true"

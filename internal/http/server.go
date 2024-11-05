@@ -11,6 +11,10 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
+
+	_ "gogdal/docs"
+
+	httpSwagger "github.com/swaggo/http-swagger" // http-swagger middleware
 )
 
 type Server struct {
@@ -44,7 +48,10 @@ func NewServer(conf *config.Config) (*Server, error) {
 	serv.Logger = zerolog.New(logf).Level(level).With().Timestamp().Logger()
 	serv.Router = chi.NewRouter()
 	serv.Router.Use(serv.Log)
-	serv.Router.Get("/intersect_polygons", serv.IntersectPolygons)
+	serv.Router.Post("/intersect_polygons", serv.IntersectPolygons)
+	if conf.Verbose == "true" {
+		serv.Router.Get("/swagger/*", httpSwagger.WrapHandler)
+	}
 	serv.Logger.Debug().Msg("Server initialized")
 	return serv, nil
 }
@@ -57,6 +64,17 @@ func (s *Server) Serve(addr string) error {
 	return http.ListenAndServe(addr, s.Router)
 }
 
+// intersect_polygons godoc
+// @Summary Intersect polygons
+// @Description Get a result of intersection of polygons
+// @Accept json
+// @Produce text/plain
+// @Success 200 {number} float64 "1.0"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /intersect_polygons [post]
+//
+//	@Param polys body []string true "Polygons in WKT or GeoJSON format"
 func (s *Server) IntersectPolygons(w http.ResponseWriter, r *http.Request) {
 	s.Logger.Debug().Msg("Handling intersect polygons request")
 	var polys []string
@@ -68,7 +86,7 @@ func (s *Server) IntersectPolygons(w http.ResponseWriter, r *http.Request) {
 	}
 	s.Logger.Debug().Msgf("Decoded polygons: %v", polys)
 	res, ok, err := s.Controller.IntersectPolygons(polys...)
-	if !ok || err != nil {
+	if err != nil || !ok {
 		w.WriteHeader(http.StatusBadRequest)
 		s.Logger.Error().Err(err).Msg("failed to intersect polygons")
 		return

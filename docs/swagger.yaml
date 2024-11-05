@@ -1,0 +1,40 @@
+basePath: /
+host: localhost:8086
+info:
+  contact: {}
+  description: This is a sample API. By default, provides 8086 port as main. Provides
+    to intersect multiple value of polygons in WKT or GeoJSON formats
+  title: Gogdal polygon intersection
+  version: "1.0"
+paths:
+  /intersect_polygons:
+    post:
+      consumes:
+      - application/json
+      description: Get a result of intersection of polygons
+      parameters:
+      - description: Polygons in WKT or GeoJSON format
+        in: body
+        name: polys
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: "1.0"
+          schema:
+            type: number
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Intersect polygons
+swagger: "2.0"
