@@ -7,7 +7,7 @@ import (
 
 func TestDiffRegex(t *testing.T) {
 
-	if gdal_vars.GeoJSONRegex.MatchString(Json) != gdal_vars.WktRegex.MatchString(Wkt) {
+	if gdal_vars.GeoJSONRegex.MatchString(Json) == gdal_vars.WktRegex.MatchString(Wkt) {
 		t.Errorf("expected %s to match %s", Json, Wkt)
 	}
 }

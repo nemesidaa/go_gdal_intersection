@@ -12,6 +12,7 @@ type Config struct {
 	Spatref    int    `yaml:"spatref"`
 	WorkerType string `yaml:"worker_type"`
 	Logdest    string `yaml:"logdest"`
+	Loglevel   string `yaml:"loglevel"`
 }
 
 func (conf *Config) Parse(path string) error {

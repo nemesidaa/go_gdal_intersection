@@ -21,6 +21,6 @@ func NewController(conf *config.Config) (*Controller, error) {
 	}, nil
 }
 
-func (c *Controller) IntersectPolygons(polys ...string) (float64, bool, error) {
-	return c.gdalw.IntersectPolygons(polys...)
+func (ctrl *Controller) IntersectPolygons(polys ...string) (float64, bool, error) {
+	return ctrl.gdalw.IntersectPolygons(polys...)
 }

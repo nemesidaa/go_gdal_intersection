@@ -25,6 +25,23 @@ func NewGdalWorker(conf *config.Config) (*GdalWorker, error) {
 
 // ? Getting polys in WKT or GeoJSON formats, outputting square and existance of the intersection
 func (gdalw *GdalWorker) IntersectPolygons(polys ...string) (float64, bool, error) {
+	ppolys, err := gdalw.TranslateToPolygons(polys...)
+	if err != nil {
+		return 0, false, fmt.Errorf("failed to translate polygons: %w", err)
+	}
+	resp := ppolys[0]
+	for _, poly := range ppolys[1:] {
+		var err error
+		resp, err = resp.Intersection(poly)
+		if err != nil {
+			return 0, false, fmt.Errorf("failed to intersect polygons: %w", err)
+		}
+	}
+	a := resp.Area()
+	return a, a != 0, nil
+}
+
+func (gdalw *GdalWorker) TranslateToPolygons(polys ...string) ([]*godal.Geometry, error) {
 	ppolys := make([]*godal.Geometry, 0, len(polys))
 	for _, upoly := range polys {
 		switch vars.GetType(upoly) {
@@ -46,14 +63,5 @@ func (gdalw *GdalWorker) IntersectPolygons(polys ...string) (float64, bool, erro
 		}
 
 	}
-	resp := ppolys[0]
-	for _, poly := range ppolys[1:] {
-		var err error
-		resp, err = resp.Intersection(poly)
-		if err != nil {
-			return 0, false, fmt.Errorf("failed to intersect polygons: %w", err)
-		}
-	}
-	a := resp.Area()
-	return a, a != 0, nil
+	return ppolys, nil
 }

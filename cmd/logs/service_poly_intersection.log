@@ -44,3 +44,27 @@
 {"level":"debug","time":"2024-10-31T14:17:40+03:00","message":"Intersection result: 4.000000"}
 {"level":"info","duration":0.045164,"method":"GET","path":"/intersect_polygons","status":200,"time":"2024-10-31T14:17:40+03:00"}
 {"level":"debug","time":"2024-10-31T14:17:40+03:00","message":"Request logged"}
+{"level":"debug","time":"2024-11-05T09:07:49+03:00","message":"Server initialized"}
+{"level":"info","addr":"0.0.0.0:8086","time":"2024-11-05T09:07:49+03:00","message":"starting server"}
+{"level":"debug","time":"2024-11-05T09:07:49+03:00","message":"Server is about to start listening"}
+{"level":"debug","time":"2024-11-05T09:08:06+03:00","message":"Logging request"}
+{"level":"debug","time":"2024-11-05T09:08:06+03:00","message":"Handling intersect polygons request"}
+{"level":"debug","time":"2024-11-05T09:08:06+03:00","message":"Decoded polygons: [{\"type\":\"Polygon\",\"coordinates\":[[100,0],[101,0],[101,1],[100,1],[100,0]]} POLYGON((100 0,101 0,101 1,100 1,100 0))]"}
+{"level":"debug","time":"2024-11-05T09:08:06+03:00","message":"Intersection result: 1.000000"}
+{"level":"info","duration":2.488387,"method":"GET","path":"/intersect_polygons","status":200,"time":"2024-11-05T09:08:06+03:00"}
+{"level":"debug","time":"2024-11-05T09:08:06+03:00","message":"Request logged"}
+{"level":"debug","time":"2024-11-05T09:08:08+03:00","message":"Logging request"}
+{"level":"debug","time":"2024-11-05T09:08:08+03:00","message":"Handling intersect polygons request"}
+{"level":"debug","time":"2024-11-05T09:08:08+03:00","message":"Decoded polygons: [{\"type\":\"Polygon\",\"coordinates\":[[100,0],[101,0],[101,1],[100,1],[100,0]]} POLYGON((100 0,101 0,101 1,100 1,100 0))]"}
+{"level":"debug","time":"2024-11-05T09:08:08+03:00","message":"Intersection result: 1.000000"}
+{"level":"info","duration":0.135352,"method":"GET","path":"/intersect_polygons","status":200,"time":"2024-11-05T09:08:08+03:00"}
+{"level":"debug","time":"2024-11-05T09:08:08+03:00","message":"Request logged"}
+{"level":"debug","time":"2024-11-05T09:08:09+03:00","message":"Logging request"}
+{"level":"debug","time":"2024-11-05T09:08:09+03:00","message":"Handling intersect polygons request"}
+{"level":"debug","time":"2024-11-05T09:08:09+03:00","message":"Decoded polygons: [{\"type\":\"Polygon\",\"coordinates\":[[100,0],[101,0],[101,1],[100,1],[100,0]]} POLYGON((100 0,101 0,101 1,100 1,100 0))]"}
+{"level":"debug","time":"2024-11-05T09:08:09+03:00","message":"Intersection result: 1.000000"}
+{"level":"info","duration":0.118352,"method":"GET","path":"/intersect_polygons","status":200,"time":"2024-11-05T09:08:09+03:00"}
+{"level":"debug","time":"2024-11-05T09:08:09+03:00","message":"Request logged"}
+{"level":"info","addr":"0.0.0.0:8086","time":"2024-11-05T09:08:33+03:00","message":"starting server"}
+{"level":"info","duration":3.567842,"method":"GET","path":"/intersect_polygons","status":200,"time":"2024-11-05T09:08:38+03:00"}
+{"level":"info","duration":0.07445,"method":"GET","path":"/intersect_polygons","status":200,"time":"2024-11-05T09:08:39+03:00"}

@@ -32,7 +32,8 @@ func NewServer(conf *config.Config) (*Server, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)
 	}
-	serv.Logger = zerolog.New(logf).Level(zerolog.DebugLevel).With().Timestamp().Logger()
+	level, err := zerolog.ParseLevel(conf.Loglevel)
+	serv.Logger = zerolog.New(logf).Level(level).With().Timestamp().Logger()
 	serv.Router = chi.NewRouter()
 	serv.Router.Use(serv.Log)
 	serv.Router.Get("/intersect_polygons", serv.IntersectPolygons)

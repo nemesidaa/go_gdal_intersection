@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"gogdal/internal/config"
 	"gogdal/internal/http"
 	"os"
@@ -11,9 +12,18 @@ var (
 )
 
 func parse() {
+
+	if len(os.Args) != 2 {
+		fmt.Fprintln(os.Stderr, "Usage: app <config-path>")
+		os.Exit(2)
+	}
 	args := os.Args[1:]
 	cpath = args[0]
-	// * fmt.Println(os.Args)
+
+	if cpath == "" {
+		fmt.Fprintln(os.Stderr, "Config path cannot be empty")
+		os.Exit(2)
+	}
 }
 func main() {
 	parse()
