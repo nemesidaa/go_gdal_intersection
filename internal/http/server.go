@@ -14,7 +14,7 @@ import (
 
 	_ "gogdal/docs"
 
-	httpSwagger "github.com/swaggo/http-swagger" // http-swagger middleware
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Server struct {
