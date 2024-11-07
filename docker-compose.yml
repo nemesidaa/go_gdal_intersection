@@ -1,0 +1,13 @@
+
+services:
+  worker-intersections:
+    build: 
+      dockerfile: ./Dockerfile
+      context: .
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./cmd/debug_conf.yaml:/app-prod/conf.yaml
+      - logs:/app-prod/logs
+volumes:
+  logs:

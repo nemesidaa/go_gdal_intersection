@@ -40,11 +40,20 @@ RUN apt-get update && \
 # * Set working directory
 WORKDIR /app-prod
 
+
 # * Copy binary and configuration
 COPY --from=builder /app-build/bins/service /app-build/cmd/conf.yaml ./
 
 # * Set command for running application
-CMD ["./service", "./conf.yaml"]
+ENTRYPOINT ["./service", "./conf.yaml"]
 
 # * Expose port
 EXPOSE 8086
+
+# !------------------------------!
+# *------------NOTES-------------*
+# * 1) Contain configs in /app-prod, pass configpath argument direct to ENV
+# * 2) Any modifications via additions of the current image
+#
+#
+#
